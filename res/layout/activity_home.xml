@@ -4,9 +4,31 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     <TextView 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/tv_home_text"
+        android:background="#00cccc"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:textSize="32sp"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:text="@string/tool_list_text"
         />
+    <cn.csc.mytools.ui.AutoFocusedTextView
+        android:id="@+id/tv_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:textSize="18sp"
+        android:textColor="#cc66ff"
+        android:text="才哥工具箱现已升级到2.0版本，更稳定更实用的工具箱，建议尽快下载更新"
+        >
+        
+    </cn.csc.mytools.ui.AutoFocusedTextView>
+    <GridView 
+        android:id="@+id/gv_tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="3"
+        ></GridView>
 
 </LinearLayout>

@@ -1,12 +1,17 @@
 package cn.csc.mytools;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import net.tsz.afinal.FinalHttp;
+import net.tsz.afinal.http.AjaxCallBack;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,14 +23,19 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +44,9 @@ public class SplashActivity extends Activity {
 	
 	private String updateInfo = null;
 	private String updateUrl = null;
+	private String new_version = null;
+	private SharedPreferences sp;
+	private ProgressBar pb_update;
 	private Handler handler = new Handler(){
 		@Override
 		public void handleMessage(Message msg) {
@@ -60,7 +73,6 @@ public class SplashActivity extends Activity {
 				break;
 			}
 		}
-		
 	};
     protected static final String TAG = "SplashActivity";
 	protected static final int URL_ERROR = 0;
@@ -76,8 +88,21 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
         TextView tv = (TextView) findViewById(R.id.tv_version);
         tv.setText("Version: "+getVersionName());
-        
-        checkUpdate();
+        pb_update = (ProgressBar) findViewById(R.id.pb_update);
+        sp = getSharedPreferences("config", MODE_PRIVATE);
+        boolean b = sp.getBoolean("auto_update", false);
+        if(!b){
+        	checkUpdate();
+        }else{
+        	//自动更新
+        	handler.postDelayed(new Runnable() {
+				
+				@Override
+				public void run() {
+					enterHome();
+				}
+			}, 2000);
+        }
         
     }
 	private void alertUpdate(){
@@ -97,8 +122,47 @@ public class SplashActivity extends Activity {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				// TODO Auto-generated method stub
+				if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+					FinalHttp fh = new FinalHttp();
+					fh.download(updateUrl, 
+							Environment.getExternalStorageDirectory().getAbsolutePath()+"/mytools"+new_version+".apk", 
+							new AjaxCallBack<File>() {
+								@Override
+								public void onFailure(Throwable t, int errorNo,
+										String strMsg) {
+									t.printStackTrace();
+									super.onFailure(t, errorNo, strMsg);
+									Toast.makeText(SplashActivity.this, "下载失败", 0).show();
+									enterHome();
+								}
+								@Override
+								public void onLoading(long count, long current) {
+									// TODO Auto-generated method stub
+									pb_update.setVisibility(View.VISIBLE);
+									pb_update.setProgress((int) (current*100/count));
+									super.onLoading(count, current);
+								}
 
+								@Override
+								public void onSuccess(File t) {
+									// TODO Auto-generated method stub
+									super.onSuccess(t);
+									Toast.makeText(SplashActivity.this, "下载成功", 0).show();
+									installAPK(t);
+								}
+								private void installAPK(File t) {
+									Intent intent = new Intent();
+									intent.setAction("android.intent.action.VIEW");
+									intent.addCategory("android.intent.category.DEFAULT");
+									intent.setDataAndType(Uri.fromFile(t), "application/vnd.android.package-archive");
+									startActivity(intent);
+								}
+					});
+				}else{
+					Toast.makeText(SplashActivity.this, "内存卡不存在", 0).show();
+					return;
+				}
+				
 			}
 		});
 		builder.setNegativeButton("下次再说", new OnClickListener() {
@@ -136,6 +200,7 @@ public class SplashActivity extends Activity {
 	    					Log.i(TAG,version);
 	    					JSONObject json = new JSONObject(version);
 	    					String new_ver = json.getString("version");
+	    					new_version = new_ver;
 	    					updateInfo = json.getString("info");
 	    					updateUrl = json.getString("url");
 	    					if(!new_ver.equals(getVersionName())){
@@ -146,6 +211,7 @@ public class SplashActivity extends Activity {
 	    						msg.what = ENTER_HOME;
 	    					}
 	    				}
+
 					} catch (MalformedURLException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
