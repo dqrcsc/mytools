@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mytools="http://schemas.android.com/apk/res/cn.csc.mytools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
@@ -13,11 +14,13 @@
         android:text="设置中心"
         />
     <cn.csc.mytools.ui.SettingItem
+        mytools:item_title="自动更新设置"
+        mytools:desc_on = "自动更新已开启"
+        mytools:desc_off = "自动更新已关闭"
         android:id="@+id/item_update"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >
-        
     </cn.csc.mytools.ui.SettingItem>
 
 </LinearLayout>

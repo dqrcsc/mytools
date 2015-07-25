@@ -58,7 +58,13 @@ public class SplashActivity extends Activity {
 				enterHome();
 				break;
 			case UPDATE:
-				alertUpdate();
+				boolean b = sp.getBoolean("auto_update", false);
+		        if(!b){
+		        	alertUpdate();
+		        }else{
+		        	//自动更新
+		        	autoUpdate();
+		        }	
 				break;
 			case ENTER_HOME:
 				enterHome();
@@ -84,27 +90,65 @@ public class SplashActivity extends Activity {
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_splash);
         TextView tv = (TextView) findViewById(R.id.tv_version);
         tv.setText("Version: "+getVersionName());
         pb_update = (ProgressBar) findViewById(R.id.pb_update);
         sp = getSharedPreferences("config", MODE_PRIVATE);
-        boolean b = sp.getBoolean("auto_update", false);
-        if(!b){
-        	checkUpdate();
-        }else{
-        	//自动更新
-        	handler.postDelayed(new Runnable() {
-				
-				@Override
-				public void run() {
-					enterHome();
-				}
-			}, 2000);
-        }
-        
+        checkUpdate();
+//        handler.postDelayed(new Runnable() {
+//			@Override
+//			public void run() {
+//				// TODO Auto-generated method stub
+//				enterHome();
+//			}
+//		}, 5000);
     }
+	private void autoUpdate(){
+		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
+			FinalHttp fh = new FinalHttp();
+			fh.download(updateUrl, 
+					Environment.getExternalStorageDirectory().getAbsolutePath()+"/mytools"+new_version+".apk", 
+					new AjaxCallBack<File>() {
+						@Override
+						public void onFailure(Throwable t, int errorNo,
+								String strMsg) {
+							t.printStackTrace();
+							super.onFailure(t, errorNo, strMsg);
+							Toast.makeText(SplashActivity.this, "下载失败", 0).show();
+							enterHome();
+						}
+						@Override
+						public void onLoading(long count, long current) {
+							// TODO Auto-generated method stub
+							pb_update.setVisibility(View.VISIBLE);
+							pb_update.setProgress((int) (current*100/count));
+							super.onLoading(count, current);
+						}
+
+						@Override
+						public void onSuccess(File t) {
+							// TODO Auto-generated method stub
+							super.onSuccess(t);
+							Toast.makeText(SplashActivity.this, "下载成功", 0).show();
+							installAPK(t);
+							
+						}
+						private void installAPK(File t) {
+							Intent intent = new Intent();
+							intent.setAction("android.intent.action.VIEW");
+							intent.addCategory("android.intent.category.DEFAULT");
+							intent.setDataAndType(Uri.fromFile(t), "application/vnd.android.package-archive");
+							startActivity(intent);
+							
+						}
+			});
+		}else{
+			Toast.makeText(SplashActivity.this, "内存卡不存在", 0).show();
+			return;
+		}
+	}
 	private void alertUpdate(){
 		AlertDialog.Builder builder = new Builder(this);
 		builder.setTitle("有新版本");
@@ -122,47 +166,7 @@ public class SplashActivity extends Activity {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-					FinalHttp fh = new FinalHttp();
-					fh.download(updateUrl, 
-							Environment.getExternalStorageDirectory().getAbsolutePath()+"/mytools"+new_version+".apk", 
-							new AjaxCallBack<File>() {
-								@Override
-								public void onFailure(Throwable t, int errorNo,
-										String strMsg) {
-									t.printStackTrace();
-									super.onFailure(t, errorNo, strMsg);
-									Toast.makeText(SplashActivity.this, "下载失败", 0).show();
-									enterHome();
-								}
-								@Override
-								public void onLoading(long count, long current) {
-									// TODO Auto-generated method stub
-									pb_update.setVisibility(View.VISIBLE);
-									pb_update.setProgress((int) (current*100/count));
-									super.onLoading(count, current);
-								}
-
-								@Override
-								public void onSuccess(File t) {
-									// TODO Auto-generated method stub
-									super.onSuccess(t);
-									Toast.makeText(SplashActivity.this, "下载成功", 0).show();
-									installAPK(t);
-								}
-								private void installAPK(File t) {
-									Intent intent = new Intent();
-									intent.setAction("android.intent.action.VIEW");
-									intent.addCategory("android.intent.category.DEFAULT");
-									intent.setDataAndType(Uri.fromFile(t), "application/vnd.android.package-archive");
-									startActivity(intent);
-								}
-					});
-				}else{
-					Toast.makeText(SplashActivity.this, "内存卡不存在", 0).show();
-					return;
-				}
-				
+				autoUpdate();
 			}
 		});
 		builder.setNegativeButton("下次再说", new OnClickListener() {
@@ -207,6 +211,7 @@ public class SplashActivity extends Activity {
 	    						//
 	    						Log.i(TAG,"版本有更新:"+version);
 	    						msg.what = UPDATE;
+	    						
 	    					}else{
 	    						msg.what = ENTER_HOME;
 	    					}
@@ -239,9 +244,7 @@ public class SplashActivity extends Activity {
 						}
 						//发送主线程消息
 						handler.sendMessage(msg);
-						
-					}
-    				
+					}	
     		}
     	}.start();
     }
