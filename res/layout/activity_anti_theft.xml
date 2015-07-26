@@ -24,9 +24,10 @@
             android:layout_marginTop="8dip"
             android:text="安全号码"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
 
         <TextView
+            android:id="@+id/tv_safe_num"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -34,7 +35,7 @@
             android:layout_marginTop="8dip"
             android:text="xxxx"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </RelativeLayout>
     <View
         android:layout_width="fill_parent"
@@ -53,7 +54,7 @@
             android:layout_marginTop="8dip"
             android:text="防盗保护是否开启"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
 
         <ImageView
             android:id="@+id/iv_lock"
@@ -64,13 +65,47 @@
             android:layout_marginTop="8dip"
             android:src="@drawable/unlock"
             android:textColor="#000000"
-            android:textSize="20sp" />
+            android:textSize="18sp" />
     </RelativeLayout>
 
     <View
         android:layout_width="fill_parent"
         android:layout_height="0.2dip"
         android:layout_marginTop="10dip"
+        android:background="#44000000" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <TextView
+            android:id="@+id/tv_active"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dip"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="8dip"
+            android:text="还未激活管理员权限"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn_active"
+            android:onClick="active"
+            android:background="@drawable/button"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dip"
+            android:layout_marginTop="8dip"
+            android:text="激活"
+            android:textColor="#000000"
+            android:textSize="18sp" />
+    </RelativeLayout>
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="0.2dip"
+        android:layout_marginTop="2dip"
         android:background="#44000000" />
 
     <TextView
@@ -84,7 +119,7 @@
         android:layout_marginTop="8dip"
         android:text="重新进入设置向导"
         android:textColor="#000000"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <View
         android:layout_width="fill_parent"
@@ -103,22 +138,26 @@
         android:textSize="20sp" />
     <TextView 
         style="@style/text_style"
-        android:text="GPS追踪:#*location*#"
+        android:text="GPS追踪:##locate##"
         android:drawableLeft="@drawable/rate_star_med_on"
         />
     <TextView 
         style="@style/text_style"
-        android:text="播放报警音乐：#*alarm*#"
+        android:text="播放报警音乐：##alarm##"
         android:drawableLeft="@drawable/rate_star_med_on"
         />
     <TextView 
         style="@style/text_style"
-        android:text="远程数据销毁:#*wipedata*#"
+        android:text="远程数据销毁:##delete##"
         android:drawableLeft="@drawable/rate_star_med_on"
         />
     <TextView 
         style="@style/text_style"
-        android:text="远程锁屏:#*lockscreen*#"
+        android:text="远程锁屏:##lock##"
         android:drawableLeft="@drawable/rate_star_med_on"
+        />
+    <TextView 
+        style="@style/text_style"
+        android:text="注：远程锁屏和数据销毁，需激活管理员权限"
         />
 </LinearLayout>

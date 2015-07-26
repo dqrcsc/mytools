@@ -10,7 +10,7 @@ import android.view.Window;
 import android.widget.Toast;
 import cn.csc.mytools.ui.SettingItem;
 
-public class SettingsActivity extends Activity {
+public class SettingsActivity extends AbstractToolsActivity {
 	private SettingItem item_update;
 	private SharedPreferences sp;
 	@Override

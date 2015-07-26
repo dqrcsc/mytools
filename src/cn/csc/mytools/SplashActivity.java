@@ -109,13 +109,14 @@ public class SplashActivity extends Activity {
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
 			FinalHttp fh = new FinalHttp();
 			fh.download(updateUrl, 
-					Environment.getExternalStorageDirectory().getAbsolutePath()+"/mytools"+new_version+".apk", 
+					Environment.getExternalStorageDirectory()+"/mytools"+new_version+".apk", 
 					new AjaxCallBack<File>() {
 						@Override
 						public void onFailure(Throwable t, int errorNo,
 								String strMsg) {
 							t.printStackTrace();
 							super.onFailure(t, errorNo, strMsg);
+							Log.i("XIAZAI",strMsg);
 							Toast.makeText(SplashActivity.this, "下载失败", 0).show();
 							enterHome();
 						}

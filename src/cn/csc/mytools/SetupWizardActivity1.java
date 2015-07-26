@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-public class SetupWizardActivity1 extends Activity {
+public class SetupWizardActivity1 extends AbstractSetupWizardActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -14,8 +14,12 @@ public class SetupWizardActivity1 extends Activity {
 		
 		setContentView(R.layout.activity_setup_wizard1);
 	}
-	
-	public void next(View view){
+	@Override
+	public void showPre() {
+		
+	}
+	@Override
+	public void showNext() {
 		Intent intent = new Intent(this, SetupWizardActivity2.class);
 		startActivity(intent);
 		finish();

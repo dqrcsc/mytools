@@ -11,7 +11,7 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 
-public class SetupWizardActivity4 extends Activity {
+public class SetupWizardActivity4 extends AbstractSetupWizardActivity {
 	
 	private SharedPreferences sp;
 	private CheckBox cb_open;
@@ -22,20 +22,38 @@ public class SetupWizardActivity4 extends Activity {
 		sp = getSharedPreferences("config", MODE_PRIVATE);
 		setContentView(R.layout.activity_setup_wizard4);
 		cb_open = (CheckBox) findViewById(R.id.cb_open);
+		check(sp.getBoolean("open_anti_theft", false));
+		
 		cb_open.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 			
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				// TODO Auto-generated method stub
-				if(isChecked){
-					Toast.makeText(SetupWizardActivity4.this, "已成功开启手机防盗", 0).show();
-				}else{
-					Toast.makeText(SetupWizardActivity4.this, "已成功关闭手机防盗", 0).show();
-				}
+				Editor edit = sp.edit();
+				edit.putBoolean("open_anti_theft", isChecked);
+				check(isChecked);
+				Toast.makeText(SetupWizardActivity4.this, isChecked?"已成功开启手机防盗":"已成功关闭手机防盗", 0).show();
+				edit.commit();
 			}
 		});
 	}
-	public void next(View view){
+	private void check(boolean isOpen){
+		cb_open.setChecked(isOpen);
+		if(isOpen){
+			cb_open.setText("已经开启手机防盗保护");
+		}else{
+			cb_open.setText("您还未开启手机防盗保护");
+		}
+	}
+	@Override
+	public void showPre() {
+		Intent intent = new Intent(this, SetupWizardActivity3.class);
+		startActivity(intent);
+		finish();
+		overridePendingTransition(R.anim.pre_in, R.anim.next_out);
+	}
+	@Override
+	public void showNext() {
 		Editor edit = sp.edit();
 		edit.putBoolean("configed", true);
 		edit.commit();
@@ -43,11 +61,5 @@ public class SetupWizardActivity4 extends Activity {
 		startActivity(intent);
 		finish();
 		overridePendingTransition(R.anim.next_in, R.anim.pre_out);
-	}
-	public void back(View view){
-		Intent intent = new Intent(this, SetupWizardActivity3.class);
-		startActivity(intent);
-		finish();
-		overridePendingTransition(R.anim.pre_in, R.anim.next_out);
 	}
 }
