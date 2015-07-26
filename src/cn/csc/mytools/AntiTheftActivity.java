@@ -26,29 +26,29 @@ public class AntiTheftActivity extends AbstractToolsActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-//		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		sp = getSharedPreferences("config", MODE_PRIVATE);
 		dpm = (DevicePolicyManager) getSystemService(DEVICE_POLICY_SERVICE);
 		boolean isConfiged = sp.getBoolean("configed", false);
 		if(isConfiged){
 			setContentView(R.layout.activity_anti_theft);
+			tv_safe_num = (TextView) findViewById(R.id.tv_safe_num);
+			iv_lock = (ImageView) findViewById(R.id.iv_lock);
+			tv_active = (TextView) findViewById(R.id.tv_active);
+			btn_active = (Button) findViewById(R.id.btn_active);
+			cn = new ComponentName(this,MyAdminReceiver.class);
+			updateUi();
+			tv_safe_num.setText(sp.getString("safe_num", ""));
+			if(sp.getBoolean("open_anti_theft", false)){
+				iv_lock.setImageResource(R.drawable.lock);
+			}else{
+				iv_lock.setImageResource(R.drawable.unlock);
+			}
 		}else{
 			Intent intent = new Intent(this, SetupWizardActivity1.class);
 			startActivity(intent);
 			finish();
 		}
-		tv_safe_num = (TextView) findViewById(R.id.tv_safe_num);
-		iv_lock = (ImageView) findViewById(R.id.iv_lock);
-		tv_active = (TextView) findViewById(R.id.tv_active);
-		btn_active = (Button) findViewById(R.id.btn_active);
-		cn = new ComponentName(this,MyAdminReceiver.class);
-		updateUi();
-		tv_safe_num.setText(sp.getString("safe_num", ""));
-		if(sp.getBoolean("open_anti_theft", false)){
-			iv_lock.setImageResource(R.drawable.lock);
-		}else{
-			iv_lock.setImageResource(R.drawable.unlock);
-		}
+		
 	}
 	public void active(View view){
 		if(dpm.isAdminActive(cn)){
